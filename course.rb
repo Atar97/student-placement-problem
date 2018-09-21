@@ -37,4 +37,8 @@ class Course
     @students.length
   end
 
+  def empty!
+    @students = []
+  end
+
 end

@@ -47,4 +47,9 @@ class Student
     to_s
   end
 
+  def reset!
+    @course = nil
+    @choice_rank = 0
+  end
+
 end

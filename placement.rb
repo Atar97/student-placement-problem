@@ -47,19 +47,20 @@ class Placement
   end
 
   def place_students
+    @students.shuffle!
     @students.each do |student|
       place_student(student)
     end
     all_students_placed?
   end
 
-  def place_student(student)
+  def place_student(student, max_choice)
     i = 0
     until student.placed?
-      raise "Student Not Placed" if i == 4
       course = student[i]
       course.add_student(student) unless course.full?
       i += 1
+      raise "Student Not Placed" if i == max_choice + 1
     end
     @choice_count += i
   end
@@ -99,6 +100,15 @@ class Placement
 
   def all_students_placed?
     @students.all? {|student| student.placed?}
+  end
+
+  def reset!
+    @students.each do |student|
+      student.reset!
+    end
+    @courses.each do |course|
+      course.empty!
+    end
   end
 
 end
