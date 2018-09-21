@@ -5,7 +5,7 @@ class Course
   attr_reader :name, :size, :students
 
   include Enumerable
-  
+
   def each(&block)
     @students.each {|stu| block.call(stu)}
   end
@@ -20,12 +20,21 @@ class Course
     @students.length >= size
   end
 
-  def add_student
+  def add_student(student)
     @students << student
+    student.get_placed(self)
   end
 
   def to_s
     "#{@name}, size: #{@size}"
+  end
+
+  def ==(course)
+    @name == course.name && @size == course.size
+  end
+
+  def number_of_students
+    @students.length
   end
 
 end

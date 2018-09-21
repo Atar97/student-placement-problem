@@ -2,38 +2,49 @@ require 'byebug'
 require_relative 'course'
 
 class Student
-  attr_reader :choices, :choice_rank, :name, :sutdent_id
+  attr_reader :course_choices, :choice_rank, :name, :sutdent_id
 
   include Enumerable
 
   def each(&block)
-    @choices.each {|choice| block.call(choice)}
+    @course_choices.each {|choice| block.call(choice)}
   end
 
   CHOICES = ['blue','green','red','yellow']
 
   def initialize(options = {})
-    @choices = options[:choices] || CHOICES.shuffle
-    @choice_rank = options[:choice_rank] || 0
+    @course_choices = options[:course_choices] || CHOICES.shuffle
     @name = options[:name]
     @student_id = options[:student_id]
   end
 
   def [](index)
-    byebug
-    @choices[index]
+    @course_choices[index]
   end
 
   def []=(index, value)
-    @choices[index] = value
+    @course_choices[index] = value
   end
 
   def to_s
     @name
   end
 
-  def get_placed(class_choice)
-    @choice_rank = @choices.index(class_choice)
+  def get_placed(course)
+    @choice_rank = @course_choices.index(course)
+    @course = course
+  end
+
+  def ==(stu2)
+    student_id == stu2.student_id
+  end
+
+  def placed?
+    !!@course
+  end
+
+  def inspect
+    to_s
   end
 
 end

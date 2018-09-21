@@ -20,23 +20,25 @@ class Placement
     result
   end
 
-  def self.students(num)
+  def self.students(num, classes)
     result = []
     Faker::LordOfTheRings.unique.clear
     num.times do
       result << Student.new(
         name: Faker::LordOfTheRings.unique.character,
-        student_id: rand(1000)
+        student_id: rand(1000),
+        course_choices: classes.shuffle
       )
     end
     result
   end
 
-  def self.seed_with_color_classes
-    Placement.new(Placement.students(16), Placement.colors(6))
+  def self.seed_with_color_classes(course_size)
+    courses = Placement.color_classes(course_size)
+    Placement.new(Placement.students(16, courses), courses)
   end
 
-  attr_reader :students, :courses
+  attr_reader :students, :courses, :choice_count
 
   def initialize(students = nil, courses = nil)
     @students = students
@@ -45,7 +47,21 @@ class Placement
   end
 
   def place_students
-    
+    @students.each do |student|
+      place_student(student)
+    end
+    all_students_placed?
+  end
+
+  def place_student(student)
+    i = 0
+    until student.placed?
+      raise "Student Not Placed" if i == 4
+      course = student[i]
+      course.add_student(student) unless course.full?
+      i += 1
+    end
+    @choice_count += i
   end
 
   def to_s
@@ -62,7 +78,9 @@ class Placement
       result[cl.name] = Hash.new(0)
     end
     @students.each do |student|
-      student.each_with_index {|choice, i| result[choice][i] += 1}
+      student.each_with_index do |course_choice, i|
+        result[course_choice.name][i] += 1
+      end
     end
     result
   end
@@ -77,6 +95,10 @@ class Placement
       end
     end
     str
+  end
+
+  def all_students_placed?
+    @students.all? {|student| student.placed?}
   end
 
 end
