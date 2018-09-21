@@ -2,40 +2,13 @@ require 'byebug'
 require 'faker'
 require_relative 'course'
 require_relative 'student'
+require_relative 'seeds'
 
 class Placement
 
-  def self.color_classes(num)
-    Student::CHOICES.map {|color| Course.new(color, num)}
-  end
-
-  def self.courses(num)
-    result = []
-    num.times do
-      result << Course.new(
-      Faker::LordOfTheRings.location,
-      rand(10..20)
-    )
-    end
-    result
-  end
-
-  def self.students(num, classes)
-    result = []
-    Faker::LordOfTheRings.unique.clear
-    num.times do
-      result << Student.new(
-        name: Faker::LordOfTheRings.unique.character,
-        student_id: rand(1000),
-        course_choices: classes.shuffle
-      )
-    end
-    result
-  end
-
   def self.seed_with_color_classes(course_size)
-    courses = Placement.color_classes(course_size)
-    Placement.new(Placement.students(16, courses), courses)
+    courses = Seed.color_classes(course_size)
+    Placement.new(Seed.students(16, courses), courses)
   end
 
   attr_reader :students, :courses, :choice_count
@@ -46,10 +19,10 @@ class Placement
     @courses = courses
   end
 
-  def place_students
+  def place_students(max_choice)
     @students.shuffle!
     @students.each do |student|
-      place_student(student)
+      place_student(student, max_choice)
     end
     all_students_placed?
   end
@@ -109,6 +82,15 @@ class Placement
     @courses.each do |course|
       course.empty!
     end
+    @choice_count = 0
   end
+
+  def print_courses
+    str = ""
+    @courses.each do |course|
+      str += "#{course.name} has #{course.number_of_students}"
+    end
+  end
+
 
 end
